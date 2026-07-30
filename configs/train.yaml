@@ -1,0 +1,33 @@
+seed: 42
+
+data:
+  dataset: bloodmnist
+  size: 224 # max size
+  data_dir: data/raw
+
+backbone:
+  name: vit_small_patch16_224
+  pretrained: true
+  frozen: true
+  batch_size: 64
+  device: auto
+
+head:
+  hidden_dim: 0
+  dropout: 0.1
+
+train:
+  epochs: 30
+  lr: 0.001
+  weight_decay: 0.0001
+  batch_size: 256
+  class_weighted_loss: true
+  early_stopping_patience: 5
+
+quality_gate:
+  min_macro_f1: 0.8
+
+mlflow:
+  experiment: cell-classifier-mlops
+  registered_model_name: blood-cell-classifier
+  champion_alias: champion
