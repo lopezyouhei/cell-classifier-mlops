@@ -63,6 +63,10 @@ prepare -> embed (cached) -> train head -> evaluate + quality gate
 
 **Why the model loads from a registry, and is not baked in the image** This decouples the model lifecycle from the application lifecycle. When a better model is available or a deployed model is not performing well anymore (data drift), a model can be promoted or rolled back by only changing the *alias*. This involves a restart of the service, and avoids having to rebuild and deploy. Additionally, `/version` reports exactly what is being served.
 
+**Why one lockfile handles both CUDA and CPU.** `torch` is configured with 2 extras (`cu126`, `cpu`) in the `pyproject.toml` file, so `uv.lock` carries both versions and the install target picks one. Training on a GPU and serving on CPU come from the same locked dependency set. Pros: no separate requirements files.
+
+**Lean docker image** The first build (M0) found 1.4 GB of package-manager cache baked into the layer, and 0.8GB of dependencies added in through `mlflow` — which ships the tracking *server*. For this project we only need to resolve a model URI, so the leaner `mlflow-skinny` package is more appropriate.
+
 ## Stack
 
 uv · DVC · MLflow · PyTorch · timm · FastAPI · Docker · GitHub Actions · Fly.io
