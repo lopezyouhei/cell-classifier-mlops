@@ -1,0 +1,22 @@
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
+ENV PYTHONBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    HF_HOME=/opt/hf
+
+WORKDIR /app
+
+# --frozen fails the build if the toml and uv.lock are out of sync
+COPY pyproject.toml uv.lock .python-version ./
+RUN uv sync --frozen --no-dev --extra cpu --no-install-project
+
+COPY src/ ./src/
+COPY configs/ ./configs/
+
+ARG GIT_SHA=unknown
+ENV GIT_SHA=${GIT_SHA} \
+    PATH="/app/.venv/bin:$PATH"
+
+EXPOSE 8080
+CMD ["uvicorn", "src.serve.app:app", "--host", "0.0.0.0", "--port", "8080"]

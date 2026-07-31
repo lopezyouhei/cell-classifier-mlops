@@ -1,0 +1,29 @@
+app = "cell-classifier-mlops"
+primary_region = "fra"
+
+[build]
+  dockerfile = "Dockerfile.serve"
+
+[env]
+  PORT = "8080"
+  STUB_MODE = "1" #TODO: switch once a model is available
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[http_service.checks]
+  [[http_service.checks.http]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    path = "/health"
+    timeout = "5s"
+
+[[vm]]
+  memory = "2gb"
+  cpu_kind = "shared"
+  cpus = 2
