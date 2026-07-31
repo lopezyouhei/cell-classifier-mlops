@@ -29,18 +29,22 @@ METRICS: dict = {
 }
 
 
+def _load_labels() -> list[str] | None:
+    try:
+        with open("artifacts/splits.json") as f:
+            meta = json.load(f)
+    except FileNotFoundError:
+        return None
+    return [meta["labels"][str(i)] for i in range(meta["n_classes"])]
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown"""
     STATE["loaded"] = load_model(cfg)
     if not STATE["loaded"].stub:
         STATE["backbone"], STATE["transform"] = load_backbone(cfg)
-    try:
-        with open("artifacts/splits.json") as f:
-            meta = json.load(f)
-        STATE["labels"] = [meta["labels"][str(i)] for i in range(meta["n_classes"])]
-    except FileNotFoundError:
-        STATE["labels"] = None
+    STATE["labels"] = _load_labels()
     log.info(json.dumps({"event": "startup", "model_version": STATE["loaded"].version}))
 
     yield
