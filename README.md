@@ -3,18 +3,20 @@ Reproducible training-to-serving pipeline for imbalanced biomedical image classi
 
 A frozen ViT backbone with a trained classification head on BloodMNIST (8 classes of blood-cell microscopy, imbalanced). The model tracked and versioned using MLflow, served using FastAPI, and shipped by CI/CD with an automated rollback path.
 
+Test macro-F1 is 0.973 (val: 0.977), and the CI quality gate is set at 0.96. The quality gate is set high enough to catch genuine regressions and loose enough to compensate for numeric differences between machines.
+
 Live at https://cell-classifier-mlops.fly.dev — [`/health`](https://cell-classifier-mlops.fly.dev/health) · [`/version`](https://cell-classifier-mlops.fly.dev/version) · [`/docs`](https://cell-classifier-mlops.fly.dev/docs)
 
-> **Status: M0** The service is containarized and deployed, currently running in stub mode (no models in registry yet). 
-> It reports the model version and git SHA for now. The training pipeline and CI/CD are planned for the next steps.
+> **Status: M1 complete** The pipeline to load data, train, evaluate, and track experiments are in place.
+> Experiments/models are tracked in mlflow.db and a script (scripts/promote.py) can promote models to @champion. 
 
 ## Roadmap
 
 | Stage | Scope | Status |
 |---|---|---|
 | **M0** | Containerized FastAPI service on Fly, health checks, stub model loading | done |
-| **M1** | DVC pipeline: prepare → embed → train → evaluate, tracked in MLflow | next |
-| **M2** | Registry-driven serving — model resolved by alias (not baked into the image) | planned |
+| **M1** | DVC pipeline: prepare → embed → train → evaluate, tracked in MLflow | done |
+| **M2** | Registry-driven serving — model resolved by alias (not baked into the image) | in-progress |
 | **M3** | CI: tests, macro-F1 quality gate, ... | needs planning |
 | **M4** | CD: build, deply, auto rollback, ... | needs planning |
 | **M5** | Structured logging, `/metrics`, drift check, operations docs | needs planning |
@@ -54,6 +56,8 @@ prepare -> embed (cached) -> train head -> evaluate + quality gate
                                 |
                  FastAPI service (resolved by alias)
 ```
+
+Training registers a new version on every run, while promoting a version to `@champion` is a deliberate separate step. This makes rollbacks an alias change rather than a redeployment. 
 
 ## Decisions highlights
 
