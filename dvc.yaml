@@ -1,0 +1,53 @@
+stages:
+  prepare:
+    cmd: python -m src.data --config configs/train.yaml
+    deps:
+      - src/data.py
+    params:
+      - configs/train.yaml:
+          - seed
+          - data
+    outs:
+      - artifacts/splits.json
+      - artifacts/class_weights.npy
+  
+  embed:
+    cmd: python -m src.embed --config configs/train.yaml
+    deps:
+      - src/embed.py
+      - artifacts/splits.json
+    params:
+      - configs/train.yaml:
+          - backbone
+          - data
+    outs:
+      - artifacts/embeddings
+  
+  train:
+    cmd: python -m src.train --config configs/train.yaml
+    deps:
+      - src/train.py
+      - src/model.py
+      - artifacts/embeddings
+      - artifacts/class_weights.npy
+    params:
+      - configs/train.yaml:
+          - seed
+          - head
+          - train
+          - mlflow
+    outs:
+      - artifacts/head.pt
+  
+  evaluate:
+    cmd: python -m src.evaluate --config configs/train.yaml
+    deps:
+      - src/evaluate.py
+      - artifacts/head.pt
+      - artifacts/embeddings
+    metrics:
+      - artifacts/metrics.json:
+          cache: false
+    plots:
+      - artifacts/confusion_matrix.png:
+          cache: false
