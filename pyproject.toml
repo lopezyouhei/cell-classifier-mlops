@@ -55,6 +55,7 @@ train = [
     "dvc-s3>=3.3.0",
     "matplotlib>=3.11.1",
     "medmnist>=3.0.2",
+    "mlflow>=3.15.0",
     "scikit-learn>=1.9.0",
     "torchvision>=0.28.0",
 ]

@@ -1,0 +1,119 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python -m src.data --config configs/train.yaml
+    deps:
+    - path: src/data.py
+      hash: md5
+      md5: a0f94d6b4c1c954a10437b82989e376f
+      size: 1872
+    params:
+      configs/train.yaml:
+        data:
+          dataset: bloodmnist
+          size: 224
+        seed: 42
+    outs:
+    - path: artifacts/class_weights.npy
+      hash: md5
+      md5: bd968e2277bcb42c6627790403c02787
+      size: 160
+    - path: artifacts/splits.json
+      hash: md5
+      md5: 96ae3c293d93cddefd74312350033c86
+      size: 568
+  embed:
+    cmd: python -m src.embed --config configs/train.yaml
+    deps:
+    - path: artifacts/splits.json
+      hash: md5
+      md5: 96ae3c293d93cddefd74312350033c86
+      size: 568
+    - path: src/embed.py
+      hash: md5
+      md5: 2932641d23080ee1b82270f3f7e49299
+      size: 2044
+    params:
+      configs/train.yaml:
+        backbone:
+          name: vit_small_patch16_224
+          pretrained: true
+          frozen: true
+          batch_size: 64
+          device: auto
+        data:
+          dataset: bloodmnist
+          size: 224
+    outs:
+    - path: artifacts/embeddings
+      hash: md5
+      md5: f62c4905363f85b3608283f051fc4f14.dir
+      size: 24355374
+      nfiles: 3
+  train:
+    cmd: python -m src.train --config configs/train.yaml
+    deps:
+    - path: artifacts/class_weights.npy
+      hash: md5
+      md5: bd968e2277bcb42c6627790403c02787
+      size: 160
+    - path: artifacts/embeddings
+      hash: md5
+      md5: f62c4905363f85b3608283f051fc4f14.dir
+      size: 24355374
+      nfiles: 3
+    - path: src/model.py
+      hash: md5
+      md5: 1b367da2d22b0837fe1ed5c94bb3c591
+      size: 878
+    - path: src/train.py
+      hash: md5
+      md5: 7284e111c373e28d55be277984b49c77
+      size: 3407
+    params:
+      configs/train.yaml:
+        head:
+          hidden_dim: 0
+          dropout: 0.1
+        mlflow:
+          experiment: cell-classifier-mlops
+          registered_model_name: blood-cell-classifier
+          champion_alias: champion
+        seed: 42
+        train:
+          epochs: 30
+          lr: 0.001
+          weight_decay: 0.0001
+          batch_size: 256
+          class_weighted_loss: true
+          early_stopping_patience: 5
+    outs:
+    - path: artifacts/head.pt
+      hash: md5
+      md5: cddb8792bbfa0e2e6eacbc59a2556cdd
+      size: 14093
+  evaluate:
+    cmd: python -m src.evaluate --config configs/train.yaml
+    deps:
+    - path: artifacts/embeddings
+      hash: md5
+      md5: f62c4905363f85b3608283f051fc4f14.dir
+      size: 24355374
+      nfiles: 3
+    - path: artifacts/head.pt
+      hash: md5
+      md5: cddb8792bbfa0e2e6eacbc59a2556cdd
+      size: 14093
+    - path: src/evaluate.py
+      hash: md5
+      md5: 8ac2aff7bfc190811b7defcb9af8a463
+      size: 2378
+    outs:
+    - path: artifacts/confusion_matrix.png
+      hash: md5
+      md5: 4c5cefc9f79f6f1332b47c880e0560b3
+      size: 62587
+    - path: artifacts/metrics.json
+      hash: md5
+      md5: c7c29925f0489bca419c3642ca7ba8b5
+      size: 471

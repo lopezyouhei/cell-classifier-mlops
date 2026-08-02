@@ -3,7 +3,6 @@ seed: 42
 data:
   dataset: bloodmnist
   size: 224 # max size
-  data_dir: data/raw
 
 backbone:
   name: vit_small_patch16_224
@@ -25,7 +24,7 @@ train:
   early_stopping_patience: 5
 
 quality_gate:
-  min_macro_f1: 0.8
+  min_macro_f1: 0.96
 
 mlflow:
   experiment: cell-classifier-mlops
