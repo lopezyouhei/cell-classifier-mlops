@@ -3,7 +3,6 @@ seed: 42
 data:
   dataset: bloodmnist
   size: 224 # max size
-  data_dir: data/raw
 
 backbone:
   name: vit_small_patch16_224
