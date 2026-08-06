@@ -27,12 +27,12 @@ def build_backbone(cfg: dict, device=torch.device):
 
 @torch.inference_mode()
 def embed_split(
-    model, transform, dataset, device, batch_size: int
+    model, transform, dataset, device, batch_size: int, num_workers: int
 ) -> tuple[np.ndarray, np.ndarray]:
     from torch.utils.data import DataLoader
 
     dataset.transform = transform
-    loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=2)
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
 
     feats, labels = [], []
     for x, y in loader:
@@ -54,7 +54,14 @@ def main() -> None:
     train, val, test, _ = load_splits(cfg, RAW_DATA)
 
     for name, ds in [("train", train), ("val", val), ("test", test)]:
-        X, y = embed_split(model, transform, ds, device, cfg["backbone"]["batch_size"])
+        X, y = embed_split(
+            model,
+            transform,
+            ds,
+            device,
+            cfg["backbone"]["batch_size"],
+            cfg["backbone"]["num_workers"],
+        )
         np.savez_compressed(out_dir / f"{name}.npz", X=X, y=y)
         print(f"{name}: {X.shape} embeddings cached")
 
