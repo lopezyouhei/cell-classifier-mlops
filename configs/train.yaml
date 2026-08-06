@@ -10,6 +10,7 @@ backbone:
   frozen: true
   batch_size: 64
   device: auto
+  num_workers: 0
 
 head:
   hidden_dim: 0
