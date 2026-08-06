@@ -9,8 +9,8 @@ WORKDIR /app
 
 # --frozen fails the build if the toml and uv.lock are out of sync
 COPY pyproject.toml uv.lock .python-version ./
-RUN uv sync --frozen --no-dev --extra cpu --no-install-project --no-cache
-
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-default-groups --extra cpu --no-install-project
 COPY src/ ./src/
 COPY configs/ ./configs/
 

@@ -20,6 +20,7 @@ cpu = ["torch>=2.13.0", "torchvision>=0.28.0"]
 cu126 = ["torch>=2.13.0", "torchvision>=0.28.0"]
 
 [tool.uv]
+default-groups = ["dev", "train"]
 conflicts = [[{ extra = "cpu" }, { extra = "cu126" }]]
 
 [[tool.uv.index]]

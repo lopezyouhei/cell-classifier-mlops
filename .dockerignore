@@ -233,3 +233,16 @@ site
 # flyctl launch added from .venv/.gitignore
 .venv/**/*
 fly.toml
+
+data/
+artifacts/
+.dvc/cache
+.git/
+.venv/
+mlruns/
+mlflow.db
+tests/
+deploy/
+notebooks/
+*.md
+__pycache__/
