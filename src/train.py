@@ -91,7 +91,7 @@ def main() -> None:
 
     mlflow.pytorch.log_model(
         head,
-        name="head",
+        artifact_path="head",
         input_example=Xtr[:1].numpy(),
         registered_model_name=cfg["mlflow"]["registered_model_name"],
     )
