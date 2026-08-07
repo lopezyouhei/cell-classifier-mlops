@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.141.0",
-    "mlflow-skinny>=3.15.0",
+    "mlflow-skinny>=2.18,<3",
     "numpy>=2.5.1",
     "pillow>=12.3.0",
     "python-multipart>=0.0.32",
@@ -52,11 +52,12 @@ dev = [
     "types-pyyaml>=6.0.12.20260724",
 ]
 train = [
+    "azureml-mlflow>=1.60.0",
     "dvc>=3.67.1",
     "dvc-s3>=3.3.0",
     "matplotlib>=3.11.1",
     "medmnist>=3.0.2",
-    "mlflow>=3.15.0",
+    "mlflow>=2.18,<3",
     "scikit-learn>=1.9.0",
     "torchvision>=0.28.0",
 ]
