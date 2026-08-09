@@ -60,8 +60,8 @@ stages:
       size: 160
     - path: artifacts/embeddings
       hash: md5
-      md5: 503c21d7999b1a89cc2c89eca0a6fe1f.dir
-      size: 24394796
+      md5: f62c4905363f85b3608283f051fc4f14.dir
+      size: 24355374
       nfiles: 3
     - path: src/model.py
       hash: md5
@@ -91,7 +91,7 @@ stages:
     outs:
     - path: artifacts/head.pt
       hash: md5
-      md5: 58780deb5c2fda08b5526f550cdc760c
+      md5: cddb8792bbfa0e2e6eacbc59a2556cdd
       size: 14093
   evaluate:
     cmd: python -m src.evaluate --config configs/train.yaml
