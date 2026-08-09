@@ -101,7 +101,7 @@ def _infer(image: Image.Image) -> dict:
     }
 
 
-@app.post("\predict")
+@app.post("/predict")
 async def predict(file: UploadFile = File(...)) -> dict:
     request_id = str(uuid.uuid4())
     start = time.perf_counter()
