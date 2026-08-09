@@ -1,13 +1,20 @@
 [project]
 name = "cell-classifier-mlops"
 version = "0.1.0"
-description = "Add your description here"
+description = """
+    An imbalanced biomedical image classifier with a frozen ViT backbone. 
+    Trained reproducibly, versioned in a model registry, served behind an API, 
+    and shipped by CI/CD with a rollback path.
+"""
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "azure-identity>=1.25.3",
+    "azureml-mlflow>=1.62.0.post5",
     "fastapi>=0.141.0",
     "mlflow-skinny>=2.18,<3",
     "numpy>=2.5.1",
+    "pandas>=2.2",
     "pillow>=12.3.0",
     "python-multipart>=0.0.32",
     "pyyaml>=6.0.3",
@@ -52,14 +59,12 @@ dev = [
     "types-pyyaml>=6.0.12.20260724",
 ]
 train = [
-    "azureml-mlflow>=1.60.0",
     "dvc>=3.67.1",
-    "dvc-s3>=3.3.0",
+    "dvc-azure>=3.1.1",
     "matplotlib>=3.11.1",
     "medmnist>=3.0.2",
     "mlflow>=2.18,<3",
     "scikit-learn>=1.9.0",
-    "torchvision>=0.28.0",
 ]
 
 [tool.pytest.ini_options]
