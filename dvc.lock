@@ -69,8 +69,8 @@ stages:
       size: 878
     - path: src/train.py
       hash: md5
-      md5: 5a75d9da69f8f61b47da4ed2783f35d9
-      size: 3416
+      md5: 6da70e00525522810b4723197e5ba1db
+      size: 3568
     params:
       configs/train.yaml:
         head:
@@ -79,7 +79,8 @@ stages:
         mlflow:
           experiment: cell-classifier-mlops
           registered_model_name: blood-cell-classifier
-          champion_alias: champion
+          champion_tag: stage
+          champion_value: champion
         seed: 42
         train:
           epochs: 30
