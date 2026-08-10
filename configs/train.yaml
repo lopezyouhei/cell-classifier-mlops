@@ -25,9 +25,11 @@ train:
   early_stopping_patience: 5
 
 quality_gate:
+  metric: best_val_macro_f1
   min_macro_f1: 0.96
 
 mlflow:
   experiment: cell-classifier-mlops
   registered_model_name: blood-cell-classifier
-  champion_alias: champion
+  champion_tag: stage
+  champion_value: champion

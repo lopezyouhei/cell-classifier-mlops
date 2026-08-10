@@ -246,3 +246,4 @@ deploy/
 notebooks/
 *.md
 __pycache__/
+sample.png

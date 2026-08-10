@@ -1,11 +1,17 @@
+import io
 import json
 import logging
 import os
+import time
+import uuid
 from collections import Counter
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+import torch
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import RedirectResponse
+from PIL import Image
 
 from src.config import load_config
 from src.serve.loader import load_backbone, load_model
@@ -31,7 +37,7 @@ METRICS: dict = {
 
 def _load_labels() -> list[str] | None:
     try:
-        with open("artifacts/splits.json") as f:
+        with open("configs/labels.json") as f:
             meta = json.load(f)
     except FileNotFoundError:
         return None
@@ -75,3 +81,63 @@ async def version() -> dict:
         "git_sha": os.getenv("GIT_SHA", "unknown"),
         "registered_model": cfg["mlflow"]["registered_model_name"],
     }
+
+
+def _infer(image: Image.Image) -> dict:
+    """
+    Blocking work (forward pass through backbone and head). Runs in worker thread.
+    """
+    loaded = STATE["loaded"]
+    with torch.inference_mode():
+        x = STATE["transform"](image).unsqueeze(0)
+        emb = STATE["backbone"](x)
+        probs = torch.softmax(loaded.model(emb), dim=1)[0]
+    idx = int(probs.argmax())
+    labels = STATE["labels"]
+    return {
+        "predicted_class": idx,
+        "label": labels[idx] if labels else str(idx),
+        "probabilities": [round(float(p), 4) for p in probs],
+    }
+
+
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)) -> dict:
+    request_id = str(uuid.uuid4())
+    start = time.perf_counter()
+    METRICS["requests"] += 1
+    loaded = STATE["loaded"]
+
+    try:
+        raw = await file.read()
+        image = Image.open(io.BytesIO(raw)).convert("RGB")
+    except Exception as exc:
+        METRICS["errors"] += 1
+        raise HTTPException(status_code=400, detail="invalid image") from exc
+
+    if loaded is None:
+        METRICS["errors"] += 1
+        raise HTTPException(status_code=503, detail="model not loaded")
+
+    if loaded.stub:
+        result = {"predicted_class": 0, "label": "stub", "probabilities": [1.0]}
+    else:
+        result = await run_in_threadpool(_infer, image)
+
+    elapsed = (time.perf_counter() - start) * 1000
+    METRICS["latency_ms_total"] += elapsed
+    METRICS["predictions"][result["label"]] += 1
+
+    log.info(
+        json.dumps(
+            {
+                "event": "predict",
+                "request_id": request_id,
+                "model_version": loaded.version,
+                "label": result["label"],
+                "latency_ms": round(elapsed, 2),
+            }
+        )
+    )
+
+    return {**result, "request_id": request_id, "model_version": loaded.version}

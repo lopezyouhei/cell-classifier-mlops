@@ -60,8 +60,8 @@ stages:
       size: 160
     - path: artifacts/embeddings
       hash: md5
-      md5: 503c21d7999b1a89cc2c89eca0a6fe1f.dir
-      size: 24394796
+      md5: f62c4905363f85b3608283f051fc4f14.dir
+      size: 24355374
       nfiles: 3
     - path: src/model.py
       hash: md5
@@ -69,8 +69,8 @@ stages:
       size: 878
     - path: src/train.py
       hash: md5
-      md5: 5a75d9da69f8f61b47da4ed2783f35d9
-      size: 3416
+      md5: 6da70e00525522810b4723197e5ba1db
+      size: 3568
     params:
       configs/train.yaml:
         head:
@@ -79,7 +79,8 @@ stages:
         mlflow:
           experiment: cell-classifier-mlops
           registered_model_name: blood-cell-classifier
-          champion_alias: champion
+          champion_tag: stage
+          champion_value: champion
         seed: 42
         train:
           epochs: 30
@@ -91,7 +92,7 @@ stages:
     outs:
     - path: artifacts/head.pt
       hash: md5
-      md5: 58780deb5c2fda08b5526f550cdc760c
+      md5: cddb8792bbfa0e2e6eacbc59a2556cdd
       size: 14093
   evaluate:
     cmd: python -m src.evaluate --config configs/train.yaml
