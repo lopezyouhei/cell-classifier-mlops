@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-from src.config import ARTIFACTS, DATA, RAW_DATA, load_config, parse_args, set_seed
+from src.config import ARTIFACTS, CONFIGS, DATA, RAW_DATA, load_config, parse_args, set_seed
 
 
 def load_splits(cfg: dict, raw_data_dir: Path | str):
@@ -61,6 +61,19 @@ def main() -> None:
     with open(ARTIFACTS / "splits.json", "w") as f:
         json.dump(summary, f, indent=2)
     print(json.dumps(summary, indent=2))
+
+    # store splits in 'configs' as the docker image wont have access to 'artifacts'
+    # necessary so that predictions can be displayed with corresponding label
+    # instead of indeces
+    with open(CONFIGS / "labels.json", "w") as f:
+        json.dump(
+            {
+                "labels": info["label"],
+                "n_classes": n_classes,
+            },
+            f,
+            indent=2,
+        )
 
 
 if __name__ == "__main__":

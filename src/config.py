@@ -35,3 +35,4 @@ def parse_args() -> argparse.Namespace:
 ARTIFACTS = Path("artifacts")
 DATA = Path("data")
 RAW_DATA = DATA / "raw"
+CONFIGS = Path("configs")

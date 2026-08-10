@@ -37,7 +37,7 @@ METRICS: dict = {
 
 def _load_labels() -> list[str] | None:
     try:
-        with open("artifacts/splits.json") as f:
+        with open("configs/labels.json") as f:
             meta = json.load(f)
     except FileNotFoundError:
         return None
