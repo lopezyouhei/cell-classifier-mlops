@@ -9,7 +9,7 @@ Live at https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azureco
 
 The service scales to zero when idle, so the first request after a quiet period will take 30-60 seconds to cold-start.
 
-> **Status: M2 complete** The service resolves a model version from the Azure ML registry over the network, authenticated by managed identity, and rollback has been performed end to end. CI/CD comes next. 
+> **Status: M2 complete** The service resolves a model version from the Azure ML registry over the network, authenticated by managed identity, and rollback has been performed end to end.
 
 ## Roadmap
 
