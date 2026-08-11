@@ -37,7 +37,5 @@ def test_predict_contract(client):
 
 
 def test_predict_rejects_non_image(client):
-    r = client.post(
-        "/predict", files={"file": ("x.txt", io.BytesIO(b"nope"), "text/plain")}
-    )
+    r = client.post("/predict", files={"file": ("x.txt", io.BytesIO(b"nope"), "text/plain")})
     assert r.status_code == 400
