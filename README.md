@@ -5,7 +5,7 @@ A frozen ViT backbone with a trained classification head on BloodMNIST (8 classe
 
 Test macro-F1 is 0.973 (val: 0.977), and the CI quality gate is set at 0.96. The quality gate is set high enough to catch genuine regressions and loose enough to compensate for numeric differences between machines.
 
-Live at https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io — [`/health`](https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io/health) · [`/version`](https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io/version) · [`/ predict`](https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io/predict) · [`/docs`](https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io/docs)
+Live at: https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io — [`/health`](https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io/health) · [`/version`](https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io/version) · [`/ predict`](https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io/predict) · [`/docs`](https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurecontainerapps.io/docs)
 
 The service scales to zero when idle, so the first request after a quiet period will take 30-60 seconds to cold-start.
 
@@ -18,7 +18,7 @@ The service scales to zero when idle, so the first request after a quiet period 
 | **M0** | Containerized FastAPI service on Fly, health checks, stub model loading | done |
 | **M1** | DVC pipeline: prepare → embed → train → evaluate, tracked in MLflow | done |
 | **M2** | Registry-driven serving, managed identity, proven rollback | done |
-| **M3** | CI: lint, type check, tests, macro-F1 quality gate, smoke tests | next |
+| **M3** | CI: lint, type check, tests, macro-F1 quality gate, smoke tests | in-progress |
 | **M4** | CD: build, deploy, post-deploy smoke tests, auto rollback | planned |
 | **M5** | Structured logging, `/metrics`, drift check, operations docs | planned |
 
