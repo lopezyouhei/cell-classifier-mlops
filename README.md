@@ -108,3 +108,5 @@ uv · DVC · MLflow · PyTorch · timm · FastAPI · Docker · GitHub Actions ·
 [MedMNIST v2](https://medmnist.com/) — BloodMNIST, 224×224 variant.
 Yang et al., *MedMNIST v2: A Large-Scale Lightweight Benchmark for 2D and 3D
 Biomedical Image Classification*, Scientific Data, 2023.
+
+TODO: remove afterwards
