@@ -55,7 +55,7 @@ def main() -> None:
         "labels": info["label"],
         "counts": {"train": len(train), "val": len(val), "test": len(test)},
         "train_class_counts": counts.tolist(),
-        "imbalance_ratio": float(counts.max() / max(counts.min(), 1)),
+        "imbalance_ratio": float(counts.max() / max(int(counts.min()), 1)),
     }
 
     with open(ARTIFACTS / "splits.json", "w") as f:
