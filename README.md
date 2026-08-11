@@ -18,7 +18,7 @@ The service scales to zero when idle, so the first request after a quiet period 
 | **M0** | Containerized FastAPI service on Fly, health checks, stub model loading | done |
 | **M1** | DVC pipeline: prepare → embed → train → evaluate, tracked in MLflow | done |
 | **M2** | Registry-driven serving, managed identity, proven rollback | done |
-| **M3** | CI: lint, type check, tests, macro-F1 quality gate, smoke tests | next |
+| **M3** | CI: lint, type check, tests, macro-F1 quality gate, smoke tests | in-progress |
 | **M4** | CD: build, deploy, post-deploy smoke tests, auto rollback | planned |
 | **M5** | Structured logging, `/metrics`, drift check, operations docs | planned |
 
