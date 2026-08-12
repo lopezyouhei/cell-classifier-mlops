@@ -9,7 +9,7 @@ Live at: https://ca-cellclassifier.happybeach-6e00f3cd.germanywestcentral.azurec
 
 The service scales to zero when idle, so the first request after a quiet period will take 30-60 seconds to cold-start.
 
-> **Status: M2 complete** The service resolves a model version from the Azure ML registry over the network, authenticated by managed identity, and rollback has been performed end to end.
+> **Status: M3 complete** The CI pipeline is integrated with 3 jobs: checks, changes, and smoke-train, triggered on every push or pull-request on main. Checks is for lint, type, format and tests. Changes to see if any pipeline-critical files have been modified. Smoke-train for evaluating that the model still passes the quality gate, and runs when checks is done and if changes returns true. 
 
 ## Roadmap
 
@@ -18,8 +18,8 @@ The service scales to zero when idle, so the first request after a quiet period 
 | **M0** | Containerized FastAPI service on Fly, health checks, stub model loading | done |
 | **M1** | DVC pipeline: prepare → embed → train → evaluate, tracked in MLflow | done |
 | **M2** | Registry-driven serving, managed identity, proven rollback | done |
-| **M3** | CI: lint, type check, tests, macro-F1 quality gate, smoke tests | in-progress |
-| **M4** | CD: build, deploy, post-deploy smoke tests, auto rollback | planned |
+| **M3** | CI: lint, type check, tests, macro-F1 quality gate, smoke tests | done |
+| **M4** | CD: build, deploy, post-deploy smoke tests, auto rollback | next |
 | **M5** | Structured logging, `/metrics`, drift check, operations docs | planned |
 
 
@@ -91,13 +91,26 @@ uv run pytest
 
 **Why the model loads from a registry, and is not baked in the image** This decouples the model lifecycle from the application lifecycle. When a better model is available or a deployed model is not performing well anymore (data drift), a model can be promoted or rolled back. This involves a restart of the service, and avoids having to rebuild and deploy. Additionally, `/version` reports exactly what is being served.
 
-**Why promotion is version pinned rather than an MLflow alias** Initially I wanted to use MLflow alias, but Azure ML implements a subset of the MLflow registry API and returns a 404 error for the alias endpoint. This is the reason the service pins an explicit `MODEL_VERSION`instead.
+**Why promotion is version pinned rather than an MLflow alias** Initially I wanted to use MLflow alias, but Azure ML implements a subset of the MLflow registry API and returns a 404 error for the alias endpoint. This is the reason the service pins an explicit `MODEL_VERSION`instead
 
-**Managed identity** The container is setup with a sytem-assigned managed identity (`AzureML Data Scientist` on the workspace to resolve the model and `Storage Blob Data Reader`on the storage account to get artifact bytes). No keys to rotate.
+**Simply no secrets - anywhere**
+- The container is setup with a sytem-assigned managed identity (`AzureML Data Scientist` on the workspace to resolve the model and `Storage Blob Data Reader`on the storage account to get artifact bytes). No keys to rotate.
+- The CI pipeline needs access to dvc-tracked artifacts (cached-embeddings, splits and class weights) for training. Instead of explicitly storing a secret, OIDC federation is used to avoid this. Like before, no risk of leaked keys.
 
 **Why one lockfile handles both CUDA and CPU.** `torch` is configured with 2 extras (`cu126`, `cpu`) in the `pyproject.toml` file, so `uv.lock` carries both versions and the install target picks one. Training on a GPU and serving on CPU come from the same locked dependency set. Pros: no separate requirements files.
 
 **Lean docker image** The first build (M0) found 1.4 GB of package-manager cache baked into the layer, and 0.8GB of dependencies added in through `mlflow` — which ships the tracking *server*. For this project we only need to resolve a model URI, so the leaner `mlflow-skinny` package is more appropriate.
+
+**Why CI writes to throwaway registry** In smoke-train the same pipeline that is used for training is invoked. Without pointing MLFLOW_TRACKING_URI to a throwaway registry, the Azure registry will be polluted with every PR or push to main.
+
+## Continuous Integration
+| Job | Task | Needs |
+| --- | ---  | ---   |
+| checks | Checks lint, format, type and tests. | N/A |
+| changes | Evaluates if training pipeline files have been modified. | N/A|
+| smoke-train | Runs training pipeline to evaluate if quality gate is still met. Saves artifacts. | checks and changes |
+
+[`PR #7`](https://github.com/lopezyouhei/cell-classifier-mlops/actions/runs/31529322291) proves how a fatal change triggers an error in the CI pipeline. 
 
 ## Stack
 
@@ -108,5 +121,3 @@ uv · DVC · MLflow · PyTorch · timm · FastAPI · Docker · GitHub Actions ·
 [MedMNIST v2](https://medmnist.com/) — BloodMNIST, 224×224 variant.
 Yang et al., *MedMNIST v2: A Large-Scale Lightweight Benchmark for 2D and 3D
 Biomedical Image Classification*, Scientific Data, 2023.
-
-TODO: remove afterwards
