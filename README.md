@@ -114,7 +114,7 @@ uv run pytest
 
 ## Stack
 
-uv · DVC · MLflow · PyTorch · timm · FastAPI · Docker · GitHub Actions · Fly.io
+uv · DVC · MLflow · PyTorch · timm · FastAPI · Docker · GitHub Actions · Azure
 
 ## Dataset
 
