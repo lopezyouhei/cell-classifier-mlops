@@ -55,8 +55,10 @@ dev = [
     "httpx>=0.28.1",
     "mypy>=2.3.0",
     "pytest>=9.1.1",
+    "requests>=2.34.2",
     "ruff>=0.16.0",
     "types-pyyaml>=6.0.12.20260724",
+    "types-requests>=2.33.0.20260712",
 ]
 train = [
     "dvc>=3.67.1",
