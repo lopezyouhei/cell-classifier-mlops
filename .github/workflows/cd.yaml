@@ -14,19 +14,19 @@ jobs:
     name: Build, deploy, verify
     runs-on: ubuntu-latest
     environment: production
-    permissions: 
+    permissions:
       id-token: write
       contents: read
       packages: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Resolve image tag
         id: meta
         run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - uses: docker/setup-buildx-action@v3
-      
+
       - name: GHCR login
         uses: docker/login-action@v3
         with:
@@ -46,14 +46,14 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/cell-classifier-mlops:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      
+
       - name: Azure login
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
+
       - name: Record current revision for rollback
         id: current
         run: |
@@ -61,15 +61,16 @@ jobs:
             --query properties.latestReadyRevisionName -o tsv)
           echo "revision=$PREV" >> $GITHUB_OUTPUT
           echo "rollback target: $PREV"
-      
+
       - name: Deploy
-        run: az containerapp update -n ca-cellclassifier -g rg-cellclassifier-dev-gwc \
-            --image ghcr.io/${{ github.repository_owner }}/cell-classifier-mlops:${{ steps.meta.outputs.sha }}
-      
+        run: |
+          az containerapp update -n ca-cellclassifier -g rg-cellclassifier-dev-gwc \
+          --image ghcr.io/${{ github.repository_owner }}/cell-classifier-mlops:${{ steps.meta.outputs.sha }}
+
       - uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
-      
+
       - name: Install smoke test dependencies
         run: uv sync --frozen --extra cpu --group dev
 
